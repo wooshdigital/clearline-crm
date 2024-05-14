@@ -1,0 +1,43 @@
+version: '3.9'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_DB: clearline
+      POSTGRES_USER: crm
+      POSTGRES_PASSWORD: crmsecret
+    tmpfs:
+      - /var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U crm -d clearline"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      DATABASE_URL: postgres://crm:crmsecret@postgres:5432/clearline?sslmode=disable
+      JWT_SECRET: supersecretjwtkey2024
+      PORT: "8080"
+      FRONTEND_URL: http://localhost:4321
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      PUBLIC_API_URL: http://localhost:8080
+      INTERNAL_API_URL: http://backend:8080
+    ports:
+      - "4321:4321"
+    depends_on:
+      - backend

@@ -1,0 +1,7 @@
+{
+  "service": "frontend",
+  "port": 4321,
+  "healthPath": "/",
+  "needsDb": true,
+  "stack": "astro+go+postgres"
+}

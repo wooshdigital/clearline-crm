@@ -46,3 +46,51 @@ func Seed(db *sql.DB) error {
 			return err
 		}
 		userIDs[u.Email] = id
+	}
+
+	// Seed contacts
+	type seedContact struct {
+		First, Last, Email, Phone, Company, Title, Status string
+	}
+	contacts := []seedContact{
+		{"Alice", "Nguyen", "alice@acmecorp.com", "+1-555-0101", "Acme Corp", "VP of Engineering", "customer"},
+		{"Marcus", "Webb", "marcus@globex.io", "+1-555-0202", "Globex", "CTO", "prospect"},
+		{"Sarah", "Kim", "sarah@initech.co", "+1-555-0303", "Initech", "Head of IT", "lead"},
+		{"David", "Torres", "dtorres@veridian.com", "+1-555-0404", "Veridian Dynamics", "CEO", "prospect"},
+		{"Priya", "Patel", "priya@nanoteck.io", "+1-555-0505", "Nanoteck", "Founder", "customer"},
+		{"James", "Okonkwo", "james@bluewave.io", "+1-555-0606", "Bluewave", "Director of Ops", "lead"},
+	}
+
+	repID := userIDs["rep@clearline.local"]
+	contactIDs := []string{}
+	for _, c := range contacts {
+		var id string
+		err := db.QueryRow(
+			`INSERT INTO contacts (owner_id, first_name, last_name, email, phone, company, title, status)
+			 VALUES ($1,$2,$3,$4,$5,$6,$7,$8) RETURNING id`,
+			repID, c.First, c.Last, c.Email, c.Phone, c.Company, c.Title, c.Status,
+		).Scan(&id)
+		if err != nil {
+			return err
+		}
+		contactIDs = append(contactIDs, id)
+	}
+
+	// Seed deals
+	type seedDeal struct {
+		ContactIdx int
+		Title      string
+		Value      float64
+		Stage      string
+		CloseDate  string
+	}
+	deals := []seedDeal{
+		{0, "Acme Enterprise License", 48000, "closed_won", "2024-03-15"},
+		{1, "Globex Platform Upgrade", 22500, "proposal", "2024-09-01"},
+		{2, "Initech Starter Pack", 5000, "qualification", "2024-10-15"},
+		{3, "Veridian Annual Subscription", 75000, "negotiation", "2024-08-30"},
+		{4, "Nanoteck Renewal", 18000, "closed_won", "2024-04-01"},
+		{5, "Bluewave Discovery", 3000, "prospecting", "2024-11-30"},
+	}
+
+	mgrID := userIDs["manager@clearline.local"]

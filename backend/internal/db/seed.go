@@ -94,3 +94,49 @@ func Seed(db *sql.DB) error {
 	}
 
 	mgrID := userIDs["manager@clearline.local"]
+	dealIDs := []string{}
+	for _, d := range deals {
+		var id string
+		err := db.QueryRow(
+			`INSERT INTO deals (contact_id, owner_id, title, value, stage, close_date)
+			 VALUES ($1,$2,$3,$4,$5,$6) RETURNING id`,
+			contactIDs[d.ContactIdx], mgrID, d.Title, d.Value, d.Stage, d.CloseDate,
+		).Scan(&id)
+		if err != nil {
+			return err
+		}
+		dealIDs = append(dealIDs, id)
+	}
+
+	// Seed activities
+	type seedActivity struct {
+		ContactIdx int
+		DealIdx    int
+		Type       string
+		Subject    string
+		Body       string
+	}
+	activities := []seedActivity{
+		{0, 0, "call", "Discovery call with Alice", "Discussed enterprise needs and pricing tier."},
+		{0, 0, "email", "Sent proposal to Alice", "Attached the enterprise license proposal PDF."},
+		{1, 1, "meeting", "Globex demo session", "Walked through the platform upgrade roadmap."},
+		{2, 2, "note", "Initial research", "Initech is evaluating us against two competitors."},
+		{3, 3, "email", "Veridian follow-up", "Confirmed interest in annual pricing."},
+		{4, 4, "call", "Nanoteck renewal check-in", "Priya wants to add 5 more seats."},
+	}
+
+	adminID := userIDs["admin@clearline.local"]
+	for _, a := range activities {
+		_, err := db.Exec(
+			`INSERT INTO activities (user_id, contact_id, deal_id, type, subject, body)
+			 VALUES ($1,$2,$3,$4,$5,$6)`,
+			adminID, contactIDs[a.ContactIdx], dealIDs[a.DealIdx], a.Type, a.Subject, a.Body,
+		)
+		if err != nil {
+			return err
+		}
+	}
+
+	log.Println("[seed] inserted demo users, contacts, deals, and activities")
+	return nil
+}

@@ -1,0 +1,62 @@
+---
+export interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title}</title>
+    <style is:global>
+      *, *::before, *::after { box-sizing: border-box; }
+      body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+
+      /* Tailwind-like utilities inlined for zero-build-dependency CSS */
+      .min-h-screen { min-height: 100vh; }
+      .bg-gray-50 { background-color: #f9fafb; }
+      .bg-white { background-color: #fff; }
+      .bg-blue-600 { background-color: #2563eb; }
+      .bg-blue-50 { background-color: #eff6ff; }
+      .bg-blue-100 { background-color: #dbeafe; }
+      .bg-green-50 { background-color: #f0fdf4; }
+      .bg-green-100 { background-color: #dcfce7; }
+      .bg-red-50 { background-color: #fef2f2; }
+      .bg-red-100 { background-color: #fee2e2; }
+      .bg-yellow-100 { background-color: #fef9c3; }
+      .bg-purple-50 { background-color: #faf5ff; }
+      .bg-purple-100 { background-color: #f3e8ff; }
+      .bg-orange-50 { background-color: #fff7ed; }
+      .bg-gray-100 { background-color: #f3f4f6; }
+      .border { border-width: 1px; border-style: solid; }
+      .border-b { border-bottom-width: 1px; border-bottom-style: solid; }
+      .border-l-4 { border-left-width: 4px; border-left-style: solid; }
+      .border-t { border-top-width: 1px; border-top-style: solid; }
+      .border-gray-100 { border-color: #f3f4f6; }
+      .border-gray-200 { border-color: #e5e7eb; }
+      .border-gray-300 { border-color: #d1d5db; }
+      .border-blue-200 { border-color: #bfdbfe; }
+      .border-blue-300 { border-color: #93c5fd; }
+      .border-green-300 { border-color: #86efac; }
+      .border-green-400 { border-color: #4ade80; }
+      .border-red-200 { border-color: #fecaca; }
+      .border-red-300 { border-color: #fca5a5; }
+      .border-purple-200 { border-color: #e9d5ff; }
+      .border-orange-200 { border-color: #fed7aa; }
+      .border-orange-300 { border-color: #fdba74; }
+      .rounded { border-radius: 0.25rem; }
+      .rounded-lg { border-radius: 0.5rem; }
+      .rounded-xl { border-radius: 0.75rem; }
+      .rounded-full { border-radius: 9999px; }
+      .p-3 { padding: 0.75rem; }
+      .p-4 { padding: 1rem; }
+      .p-5 { padding: 1.25rem; }
+      .px-4 { padding-left: 1rem; padding-right: 1rem; }
+      .px-6 { padding-left: 1.5rem; padding-right: 1.5rem; }
+      .py-1 { padding-top: 0.25rem; padding-bottom: 0.25rem; }
+      .py-2 { padding-top: 0.5rem; padding-bottom: 0.5rem; }
+      .py-3 { padding-top: 0.75rem; padding-bottom: 0.75rem; }

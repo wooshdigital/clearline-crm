@@ -142,3 +142,4 @@ func (h *DealHandler) Update(w http.ResponseWriter, r *http.Request) {
 	d.ID = id
 	writeJSON(w, http.StatusOK, d)
 }
+

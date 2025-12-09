@@ -1,0 +1,76 @@
+---
+/**
+ * ClearLine CRM — Dashboard / landing page.
+ * Server-rendered: fetches summary data from the backend API.
+ */
+import Layout from '../layouts/Layout.astro';
+
+const INTERNAL_API = import.meta.env.INTERNAL_API_URL || 'http://localhost:8080';
+
+let contacts: any[] = [];
+let deals: any[] = [];
+let activities: any[] = [];
+let apiError: string | null = null;
+
+try {
+  // Try to hit the public demo credentials to get a token for SSR data
+  const loginRes = await fetch(`${INTERNAL_API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'admin@clearline.local', password: 'admin123' }),
+  });
+
+  if (loginRes.ok) {
+    const { token } = await loginRes.json();
+    const headers = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+
+    const [contactsRes, dealsRes, activitiesRes] = await Promise.all([
+      fetch(`${INTERNAL_API}/api/contacts`, { headers }),
+      fetch(`${INTERNAL_API}/api/deals`, { headers }),
+      fetch(`${INTERNAL_API}/api/activities`, { headers }),
+    ]);
+
+    contacts = await contactsRes.json();
+    deals = await dealsRes.json();
+    activities = await activitiesRes.json();
+  }
+} catch (e: any) {
+  apiError = e.message;
+}
+
+const totalValue = deals.reduce((sum: number, d: any) => sum + Number(d.value || 0), 0);
+const wonDeals = deals.filter((d: any) => d.stage === 'closed_won');
+const wonValue = wonDeals.reduce((sum: number, d: any) => sum + Number(d.value || 0), 0);
+
+const stageOrder = ['prospecting','qualification','proposal','negotiation','closed_won','closed_lost'];
+const dealsByStage: Record<string, any[]> = {};
+for (const stage of stageOrder) {
+  dealsByStage[stage] = deals.filter((d: any) => d.stage === stage);
+}
+
+const statusColors: Record<string, string> = {
+  lead: 'bg-yellow-100 text-yellow-800',
+  prospect: 'bg-blue-100 text-blue-800',
+  customer: 'bg-green-100 text-green-800',
+  churned: 'bg-red-100 text-red-800',
+};
+
+const activityIcons: Record<string, string> = {
+  call: '📞',
+  email: '✉️',
+  meeting: '🤝',
+  note: '📝',
+  task: '✅',
+};
+
+const stageLabels: Record<string, string> = {
+  prospecting: 'Prospecting',
+  qualification: 'Qualification',
+  proposal: 'Proposal',
+  negotiation: 'Negotiation',
+  closed_won: 'Closed Won',
+  closed_lost: 'Closed Lost',
+};
+
+const stageColors: Record<string, string> = {
+  prospecting: 'border-gray-300',

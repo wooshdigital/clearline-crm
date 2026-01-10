@@ -74,3 +74,79 @@ const stageLabels: Record<string, string> = {
 
 const stageColors: Record<string, string> = {
   prospecting: 'border-gray-300',
+  qualification: 'border-blue-300',
+  proposal: 'border-purple-300',
+  negotiation: 'border-orange-300',
+  closed_won: 'border-green-400',
+  closed_lost: 'border-red-300',
+};
+---
+
+<Layout title="ClearLine CRM — Dashboard">
+  <div class="min-h-screen bg-gray-50">
+    <!-- Header -->
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">CL</span>
+          </div>
+          <span class="text-xl font-semibold text-gray-900">ClearLine CRM</span>
+        </div>
+        <nav class="flex items-center gap-6 text-sm">
+          <a href="/" class="text-blue-600 font-medium">Dashboard</a>
+          <a href="/contacts" class="text-gray-500 hover:text-gray-800">Contacts</a>
+          <a href="/deals" class="text-gray-500 hover:text-gray-800">Deals</a>
+          <a href="/activities" class="text-gray-500 hover:text-gray-800">Activities</a>
+        </nav>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">A</span>
+          <span>Admin User</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+      {apiError && (
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">
+          ⚠️ Could not connect to API: {apiError}
+        </div>
+      )}
+
+      <!-- Page title -->
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">Dashboard</h1>
+        <p class="text-gray-500 mt-1">Welcome back! Here's what's happening today.</p>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Total Contacts</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{contacts.length}</p>
+          <p class="text-xs text-gray-400 mt-1">{contacts.filter((c: any) => c.status === 'customer').length} customers</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Active Deals</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{deals.filter((d: any) => !['closed_won','closed_lost'].includes(d.stage)).length}</p>
+          <p class="text-xs text-gray-400 mt-1">{deals.length} total</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Pipeline Value</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">${totalValue.toLocaleString()}</p>
+          <p class="text-xs text-gray-400 mt-1">${wonValue.toLocaleString()} won</p>
+        </div>
+        <div class="bg-white rounded-xl border border-gray-200 p-5">
+          <p class="text-xs font-medium text-gray-500 uppercase tracking-wide">Recent Activities</p>
+          <p class="text-3xl font-bold text-gray-900 mt-1">{activities.length}</p>
+          <p class="text-xs text-gray-400 mt-1">across all contacts</p>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <!-- Deal pipeline -->
+        <div class="lg:col-span-2">
+          <h2 class="text-base font-semibold text-gray-900 mb-4">Deal Pipeline</h2>
+          <div class="space-y-3">
+            {stageOrder.map(stage => (
+              <div class={`bg-white border-l-4 ${stageColors[stage]} rounded-lg border border-gray-200 p-4`}>

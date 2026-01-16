@@ -19,3 +19,4 @@ COPY --from=builder /app/package.json ./
 EXPOSE 4321
 
 CMD ["node", "./dist/server/entry.mjs"]
+

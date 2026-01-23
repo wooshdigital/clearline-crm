@@ -140,3 +140,4 @@ func Seed(db *sql.DB) error {
 	log.Println("[seed] inserted demo users, contacts, deals, and activities")
 	return nil
 }
+

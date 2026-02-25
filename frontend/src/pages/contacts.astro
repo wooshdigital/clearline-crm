@@ -1,0 +1,106 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const INTERNAL_API = import.meta.env.INTERNAL_API_URL || 'http://localhost:8080';
+
+let contacts: any[] = [];
+let error: string | null = null;
+
+try {
+  const loginRes = await fetch(`${INTERNAL_API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'admin@clearline.local', password: 'admin123' }),
+  });
+  if (loginRes.ok) {
+    const { token } = await loginRes.json();
+    const res = await fetch(`${INTERNAL_API}/api/contacts`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    contacts = await res.json();
+  }
+} catch (e: any) {
+  error = e.message;
+}
+
+const statusColors: Record<string, string> = {
+  lead: 'bg-yellow-100 text-yellow-800',
+  prospect: 'bg-blue-100 text-blue-800',
+  customer: 'bg-green-100 text-green-800',
+  churned: 'bg-red-100 text-red-800',
+};
+---
+
+<Layout title="Contacts — ClearLine CRM">
+  <div class="min-h-screen bg-gray-50">
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">CL</span>
+          </div>
+          <span class="text-xl font-semibold text-gray-900">ClearLine CRM</span>
+        </div>
+        <nav class="flex items-center gap-6 text-sm">
+          <a href="/" class="text-gray-500 hover:text-gray-800">Dashboard</a>
+          <a href="/contacts" class="text-blue-600 font-medium">Contacts</a>
+          <a href="/deals" class="text-gray-500 hover:text-gray-800">Deals</a>
+          <a href="/activities" class="text-gray-500 hover:text-gray-800">Activities</a>
+        </nav>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">A</span>
+          <span>Admin User</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Contacts</h1>
+        <span class="text-sm text-gray-400">{contacts.length} total</span>
+      </div>
+
+      {error && (
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">⚠️ {error}</div>
+      )}
+
+      <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+        <table class="w-full text-sm">
+          <thead class="bg-gray-50 border-b border-gray-200">
+            <tr>
+              <th class="text-left px-4 py-3 font-medium text-gray-500">Name</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500">Company</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500">Email</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500">Phone</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500">Status</th>
+              <th class="text-left px-4 py-3 font-medium text-gray-500">Added</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-100">
+            {contacts.map((c: any) => (
+              <tr class="hover:bg-gray-50 transition-colors">
+                <td class="px-4 py-3">
+                  <div class="flex items-center gap-2">
+                    <div class="w-7 h-7 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 text-xs font-bold">
+                      {c.first_name[0]}{c.last_name[0]}
+                    </div>
+                    <span class="font-medium text-gray-900">{c.first_name} {c.last_name}</span>
+                  </div>
+                </td>
+                <td class="px-4 py-3 text-gray-600">{c.company || '—'}</td>
+                <td class="px-4 py-3 text-gray-600">{c.email || '—'}</td>
+                <td class="px-4 py-3 text-gray-600">{c.phone || '—'}</td>
+                <td class="px-4 py-3">
+                  <span class={`text-xs font-medium px-2 py-0.5 rounded-full ${statusColors[c.status]}`}>
+                    {c.status}
+                  </span>
+                </td>
+                <td class="px-4 py-3 text-gray-400">{new Date(c.created_at).toLocaleDateString()}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </main>
+  </div>
+</Layout>

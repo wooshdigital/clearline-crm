@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const INTERNAL_API = import.meta.env.INTERNAL_API_URL || 'http://localhost:8080';
+
+let deals: any[] = [];
+let error: string | null = null;
+
+try {
+  const loginRes = await fetch(`${INTERNAL_API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'admin@clearline.local', password: 'admin123' }),
+  });
+  if (loginRes.ok) {
+    const { token } = await loginRes.json();
+    const res = await fetch(`${INTERNAL_API}/api/deals`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    deals = await res.json();
+  }
+} catch (e: any) {
+  error = e.message;
+}
+
+const stages = [
+  { key: 'prospecting', label: 'Prospecting', color: 'bg-gray-100 border-gray-300' },
+  { key: 'qualification', label: 'Qualification', color: 'bg-blue-50 border-blue-200' },
+  { key: 'proposal', label: 'Proposal', color: 'bg-purple-50 border-purple-200' },
+  { key: 'negotiation', label: 'Negotiation', color: 'bg-orange-50 border-orange-200' },
+  { key: 'closed_won', label: 'Closed Won', color: 'bg-green-50 border-green-300' },
+  { key: 'closed_lost', label: 'Closed Lost', color: 'bg-red-50 border-red-200' },
+];
+
+const dealsByStage = (stage: string) => deals.filter((d: any) => d.stage === stage);

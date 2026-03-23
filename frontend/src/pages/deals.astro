@@ -33,3 +33,38 @@ const stages = [
 ];
 
 const dealsByStage = (stage: string) => deals.filter((d: any) => d.stage === stage);
+const stageTotal = (stage: string) =>
+  dealsByStage(stage).reduce((sum: number, d: any) => sum + Number(d.value), 0);
+---
+
+<Layout title="Deals — ClearLine CRM">
+  <div class="min-h-screen bg-gray-50">
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">CL</span>
+          </div>
+          <span class="text-xl font-semibold text-gray-900">ClearLine CRM</span>
+        </div>
+        <nav class="flex items-center gap-6 text-sm">
+          <a href="/" class="text-gray-500 hover:text-gray-800">Dashboard</a>
+          <a href="/contacts" class="text-gray-500 hover:text-gray-800">Contacts</a>
+          <a href="/deals" class="text-blue-600 font-medium">Deals</a>
+          <a href="/activities" class="text-gray-500 hover:text-gray-800">Activities</a>
+        </nav>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">A</span>
+          <span>Admin User</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Deal Pipeline</h1>
+        <span class="text-sm text-gray-400">{deals.length} deals · ${deals.reduce((s: number, d: any) => s + Number(d.value), 0).toLocaleString()} total</span>
+      </div>
+
+      {error && (
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">⚠️ {error}</div>

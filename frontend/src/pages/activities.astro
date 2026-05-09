@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+
+const INTERNAL_API = import.meta.env.INTERNAL_API_URL || 'http://localhost:8080';
+
+let activities: any[] = [];
+let error: string | null = null;
+
+try {
+  const loginRes = await fetch(`${INTERNAL_API}/api/auth/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ email: 'admin@clearline.local', password: 'admin123' }),
+  });
+  if (loginRes.ok) {
+    const { token } = await loginRes.json();
+    const res = await fetch(`${INTERNAL_API}/api/activities`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    activities = await res.json();
+  }
+} catch (e: any) {
+  error = e.message;
+}
+
+const activityIcons: Record<string, string> = {
+  call: '📞',
+  email: '✉️',
+  meeting: '🤝',
+  note: '📝',
+  task: '✅',
+};
+
+const typeColors: Record<string, string> = {
+  call: 'bg-green-100 text-green-700',
+  email: 'bg-blue-100 text-blue-700',
+  meeting: 'bg-purple-100 text-purple-700',
+  note: 'bg-yellow-100 text-yellow-700',
+  task: 'bg-gray-100 text-gray-700',
+};
+---
+
+<Layout title="Activities — ClearLine CRM">
+  <div class="min-h-screen bg-gray-50">
+    <header class="bg-white border-b border-gray-200 px-6 py-4">
+      <div class="max-w-7xl mx-auto flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
+            <span class="text-white font-bold text-sm">CL</span>
+          </div>
+          <span class="text-xl font-semibold text-gray-900">ClearLine CRM</span>
+        </div>
+        <nav class="flex items-center gap-6 text-sm">
+          <a href="/" class="text-gray-500 hover:text-gray-800">Dashboard</a>
+          <a href="/contacts" class="text-gray-500 hover:text-gray-800">Contacts</a>
+          <a href="/deals" class="text-gray-500 hover:text-gray-800">Deals</a>
+          <a href="/activities" class="text-blue-600 font-medium">Activities</a>

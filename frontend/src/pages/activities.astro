@@ -55,3 +55,59 @@ const typeColors: Record<string, string> = {
           <a href="/contacts" class="text-gray-500 hover:text-gray-800">Contacts</a>
           <a href="/deals" class="text-gray-500 hover:text-gray-800">Deals</a>
           <a href="/activities" class="text-blue-600 font-medium">Activities</a>
+        </nav>
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <span class="w-7 h-7 rounded-full bg-blue-600 flex items-center justify-center text-white text-xs font-bold">A</span>
+          <span>Admin User</span>
+        </div>
+      </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-6 py-8">
+      <div class="flex items-center justify-between mb-6">
+        <h1 class="text-2xl font-bold text-gray-900">Activity Timeline</h1>
+        <span class="text-sm text-gray-400">{activities.length} events</span>
+      </div>
+
+      {error && (
+        <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm">⚠️ {error}</div>
+      )}
+
+      <div class="relative">
+        <div class="absolute left-5 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+        <div class="space-y-6">
+          {activities.map((a: any) => (
+            <div class="flex gap-4 relative">
+              <div class="w-10 h-10 rounded-full bg-white border-2 border-gray-200 flex items-center justify-center flex-shrink-0 z-10">
+                <span class="text-base">{activityIcons[a.type] || '📋'}</span>
+              </div>
+              <div class="flex-1 bg-white rounded-xl border border-gray-200 p-4">
+                <div class="flex items-start justify-between gap-2">
+                  <div>
+                    <h3 class="text-sm font-semibold text-gray-900">{a.subject}</h3>
+                    {a.body && (
+                      <p class="text-sm text-gray-500 mt-1">{a.body}</p>
+                    )}
+                  </div>
+                  <span class={`text-xs font-medium px-2 py-0.5 rounded-full flex-shrink-0 ${typeColors[a.type]}`}>
+                    {a.type}
+                  </span>
+                </div>
+                <div class="flex items-center gap-3 mt-3 text-xs text-gray-400">
+                  {a.user_name && <span>👤 {a.user_name}</span>}
+                  <span>🕐 {new Date(a.occurred_at).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+          {activities.length === 0 && (
+            <div class="text-center py-16 text-gray-400">
+              <p class="text-4xl mb-3">📋</p>
+              <p class="text-sm">No activities logged yet.</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  </div>
+</Layout>
